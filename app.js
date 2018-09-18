@@ -64,10 +64,10 @@ app.use(bodyParser.urlencoded({
 // set secret variable
 app.set('secret', secretKey);
 // login 
-app.use(expressJWT({ secret: secretKey }).unless({ path: ['/login', '/blocktxnum','/blockchat'] }));
+app.use(expressJWT({ secret: secretKey }).unless({ path: ['/login','/register', '/blocktxnum','/blockchat'] }));
 app.use(bearerToken());
 app.use(function (req, res, next) {
-	if (req.originalUrl.indexOf('/login') >= 0 || req.originalUrl.indexOf('/blocktxnum') >= 0|| req.originalUrl.indexOf('/blockchat') >= 0) {
+	if (req.originalUrl.indexOf('/login') >= 0 || req.originalUrl.indexOf('/blocktxnum') >= 0|| req.originalUrl.indexOf('/blockchat') >= 0 || req.originalUrl.indexOf('/register') >= 0) {
 		return next();
 	}
 	var token = req.token;
