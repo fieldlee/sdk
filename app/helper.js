@@ -344,15 +344,17 @@ var registerUser = function (username, userOrg, isJson) {
 	}).then((user) => {
 		if (user.success && user.success==false) {
 			return user;
-		}
-		if (isJson && isJson === true) {
-			var response = {
-				success: true,
-				secret: user._enrollmentSecret,
-				certificate:user._identity._certificate,
-				message: username + ' enrolled Successfully2',
-			};
-			return response;
+		}else{
+			if (isJson && isJson === true) {
+				logger.info(user);
+				var response = {
+					success: true,
+					secret: user._enrollmentSecret,
+					certificate:user._identity._certificate,
+					message: username + ' enrolled Successfully2',
+				};
+				return response;
+			}
 		}
 		return user;
 	}, (err) => {
