@@ -343,16 +343,16 @@ var registerUser = function (username, userOrg, isJson) {
 			}
 		});
 	}).then((user) => {
-		logger.info(user);
+		// logger.info(user);
 
 		if (user._identity) {
-			logger.info(user._identity);
-			logger.info(user._identity._certificate);
+			// logger.info(user._identity);
+			// logger.info(user._identity._certificate);
 			var response = {
 				success: true,
 				secret: user._enrollmentSecret,
 				certificate:user._identity._certificate,
-				message: username + ' enrolled Successfully2',
+				message: username + ' enrolled Successfully',
 			};
 			return response;
 		} else {
