@@ -162,7 +162,6 @@ app.post('/register',function (req, res) {
 
 	helper.registerUser(username, orgName, true).then(function (response) {
 		if (response && typeof response !== 'string') {
-			response.token = token;
 			res.send(response);
 		} else {
 			res.json({
