@@ -301,6 +301,7 @@ var registerUser = function (username, userOrg, isJson) {
 					success: false,
 					message: "已注册"
 				};
+				logger.info("1");
 				return response;
 			} else {
 				let caClient = caClients[userOrg];
@@ -343,9 +344,16 @@ var registerUser = function (username, userOrg, isJson) {
 		});
 	}).then((user) => {
 		if (user.success && user.success==false) {
-			return user;
+			logger.info("2");
+			var response = {
+				success: false,
+				message: "已注册"
+			}
+			return response;
 		}else{
+			logger.info("3");
 			if (isJson && isJson === true) {
+				logger.info("4");
 				logger.info(user);
 				var response = {
 					success: true,
@@ -353,9 +361,11 @@ var registerUser = function (username, userOrg, isJson) {
 					// certificate:user._identity._certificate,
 					message: username + ' enrolled Successfully2',
 				};
+				logger.info("6");
 				return response;
 			}
 		}
+		logger.info("5");
 		return user;
 	}, (err) => {
 		logger.error(util.format('Failed to get registered user: %s, error: %s', username, err.stack ? err.stack : err));
