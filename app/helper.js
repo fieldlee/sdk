@@ -350,7 +350,7 @@ var registerUser = function (username, userOrg, isJson) {
 				var response = {
 					success: true,
 					secret: user._enrollmentSecret,
-					certificate:user._identity._certificate,
+					// certificate:user._identity._certificate,
 					message: username + ' enrolled Successfully2',
 				};
 				return response;
