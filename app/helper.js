@@ -54,13 +54,13 @@ for (const chanindex in chanList) {
 		for (const keyindex in chan.includes) {
 			let key = chan.includes[keyindex];
 			// client
-			var client ;
+			var client;
 			if (clients[key]) {
 				client = clients[key];
-			}else{
+			} else {
 				client = new hfc();
 			}
-			 
+
 			logger.debug("======================================org key:" + key);
 			let cryptoSuite = hfc.newCryptoSuite();
 			cryptoSuite.setCryptoKeyStore(hfc.newCryptoKeyStore({ path: getKeyStoreForOrg(ORGS[key].name) }));
@@ -78,10 +78,10 @@ for (const chanindex in chanList) {
 				let chans = channels[key];
 				chans.push(channel);
 				channels[key] = chans;
-			}else{
+			} else {
 				channels[key] = [channel];
 			}
-			
+
 			aliasNames[key] = ORGS[key].aliasName;
 			setupPeers(channel, key, client);
 
@@ -90,10 +90,10 @@ for (const chanindex in chanList) {
 		}
 	} else {
 		let key = currentOrgId;
-		var client ;
+		var client;
 		if (clients[key]) {
 			client = clients[key];
-		}else{
+		} else {
 			client = new hfc();
 		}
 		// let client = new hfc();
@@ -113,7 +113,7 @@ for (const chanindex in chanList) {
 			let chans = channels[key];
 			chans.push(channel);
 			channels[key] = chans;
-		}else{
+		} else {
 			channels[key] = [channel];
 		}
 
@@ -179,8 +179,8 @@ function newRemotes(names, forPeers, userOrg) {
 	// find the peer that match the names
 	for (let idx in names) {
 		let peerName = names[idx];
-		logger.info("peerName:",peerName);
-		logger.info("ORGS:",ORGS);
+		logger.info("peerName:", peerName);
+		logger.info("ORGS:", ORGS);
 		if (ORGS[userOrg].peers[peerName]) {
 			// found a peer matching the name
 			// let data = fs.readFileSync(path.join(__dirname, ORGS[userOrg].peers[peerName]['tls_cacerts']));
@@ -211,11 +211,11 @@ function newRemotes(names, forPeers, userOrg) {
 //-------------------------------------//
 // APIs
 //-------------------------------------//
-var getChannelForOrg = function (channelName , org) {
+var getChannelForOrg = function (channelName, org) {
 	let chans = channels[org];
 	for (let index = 0; index < chans.length; index++) {
 		const chan = chans[index];
-		if (chan._name == channelName){
+		if (chan._name == channelName) {
 			return chan;
 		}
 	}
@@ -343,30 +343,21 @@ var registerUser = function (username, userOrg, isJson) {
 			}
 		});
 	}).then((user) => {
-		if (user.success && user.success==false) {
-			logger.info("2");
+		logger.info(user);
+
+		if (user._identity) {
+			logger.info(user._identity);
+			logger.info(user._identity._certificate);
 			var response = {
-				success: false,
-				message: "已注册"
-			}
+				success: true,
+				secret: user._enrollmentSecret,
+				certificate:user._identity._certificate,
+				message: username + ' enrolled Successfully2',
+			};
 			return response;
-		}else{
-			logger.info("3");
-			if (isJson && isJson === true) {
-				logger.info("4");
-				logger.info(user);
-				var response = {
-					success: true,
-					secret: user._enrollmentSecret,
-					// certificate:user._identity._certificate,
-					message: username + ' enrolled Successfully2',
-				};
-				logger.info("6");
-				return response;
-			}
+		} else {
+			return user;
 		}
-		logger.info("5");
-		return user;
 	}, (err) => {
 		logger.error(util.format('Failed to get registered user: %s, error: %s', username, err.stack ? err.stack : err));
 		return '' + err;
@@ -485,7 +476,7 @@ var getLogger = function (moduleName) {
 	return logger;
 };
 
-var buildTarget = function(peer, org) {
+var buildTarget = function (peer, org) {
 	var target = null;
 	if (typeof peer !== 'undefined') {
 		let targets = newPeers([peer], org);
@@ -535,10 +526,10 @@ let getBlockTx = async function (channel, index, org) {
 		return null;
 	}).then((blockinfo) => {
 		if (blockinfo) {
-			if (blockinfo.data.data.length){
+			if (blockinfo.data.data.length) {
 				let datalen = blockinfo.data.data.length;
 				if (typeof (datalen) == "string") {
-					datalen =  parseInt(datalen)
+					datalen = parseInt(datalen)
 				}
 				return datalen;
 			}
@@ -564,10 +555,10 @@ let getBlockDateNumber = async function (channel, index, org) {
 		return null;
 	}).then((blockinfo) => {
 		if (blockinfo) {
-			if (blockinfo.data.data[0] && blockinfo.data.data[0].payload.header.channel_header.timestamp){
+			if (blockinfo.data.data[0] && blockinfo.data.data[0].payload.header.channel_header.timestamp) {
 				let time = new Date(blockinfo.data.data[0].payload.header.channel_header.timestamp);
 				var dateTxBlock = {};
-				var strDateFormat = (time.getMonth()+1).toString()+"-"+time.getDate().toString();
+				var strDateFormat = (time.getMonth() + 1).toString() + "-" + time.getDate().toString();
 				dateTxBlock[strDateFormat] = {}
 				let datalen = blockinfo.data.data.length;
 				dateTxBlock[strDateFormat]["block"] = 1;
