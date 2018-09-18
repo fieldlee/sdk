@@ -342,6 +342,7 @@ var registerUser = function (username, userOrg, isJson) {
 			}
 		});
 	}).then((user) => {
+		logger.info(user);
 		if (isJson && isJson === true) {
 			var response = {
 				success: true,
