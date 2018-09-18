@@ -297,7 +297,6 @@ var registerUser = function (username, userOrg, isJson) {
 		return client.getUserContext(username, true).then((user) => {
 			if (user && user.isEnrolled()) {
 				logger.info('Successfully loaded member from persistence');
-				return {"":""};
 				var response = {
 					success: false,
 					message: "已注册"
@@ -348,7 +347,7 @@ var registerUser = function (username, userOrg, isJson) {
 				success: true,
 				secret: user._enrollmentSecret,
 				certificate:user._identity._certificate,
-				message: username + ' enrolled Successfully',
+				message: username + ' enrolled Successfully2',
 			};
 			return response;
 		}
