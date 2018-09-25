@@ -465,7 +465,7 @@ app.post('/channels/:channel/chaincodes/:chaincodeName', function (req, res) {
 				// }
 				// else {
 				res.json({
-					success: false,
+					success: true,
 					info: message
 				});
 				// }
