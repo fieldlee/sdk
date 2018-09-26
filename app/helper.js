@@ -214,9 +214,7 @@ function newRemotes(names, forPeers, userOrg) {
 var getChannelForOrg = function (channelName, org) {
 	logger.debug("channelName:"+channelName);
 	logger.debug("org:"+org);
-	
 	let chans = channels[org];
-	logger.debug("channels:"+JSON.stringify(chans));
 	for (let index = 0; index < chans.length; index++) {
 		const chan = chans[index];
 		if (chan._name == channelName) {
