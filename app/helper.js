@@ -380,34 +380,15 @@ var loginRegisteredUser = function (username, userOrg) {
 				return true;
 			} else {
 				let caClient = caClients[userOrg];
-				return getAdminUser(userOrg).then(function (adminUserObj) {
-					member = adminUserObj;
-					return caClient.register({
-						enrollmentID: username,
-						affiliation: aliasNames[userOrg].toLowerCase() + '.department1'
-					}, member);
-				}).then((secret) => {
-					enrollmentSecret = secret;
-					logger.debug(username + ' registered successfully');
-					return caClient.enroll({
-						enrollmentID: username,
-						enrollmentSecret: secret
-					});
-				}, (err) => {
-					logger.debug(username + ' failed to register');
-					return '' + err;
-					//return 'Failed to register '+username+'. Error: ' + err.stack ? err.stack : err;
-				}).then((message) => {
-					if (message && typeof message === 'string' && message.includes(
-						'Error:')) {
-						logger.error(username + ' enrollment failed');
-						return message;
-					}
+				return caClient.reenroll(username).then((message) => {
+					logger.debug(util.format("%s reenroll %s ",username,JSON.stringify(message)));
 					logger.debug(username + ' enrolled successfully');
-
 					member = new User(username);
 					member._enrollmentSecret = enrollmentSecret;
 					return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
+				},(err)=>{
+					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+					return false;
 				}).then(() => {
 					client.setUserContext(member);
 					return true;
