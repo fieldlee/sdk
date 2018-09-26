@@ -388,11 +388,11 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 	},(err)=>{
 		logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
 	});
-	// return hfc.newDefaultKeyValueStore({
-	// 	path: getKeyStoreForOrg(getOrgName(userOrg))
-	// }).then((store) => {
-	// 	client.setStateStore(store);
-	// 	client._userContext = null;
+	return hfc.newDefaultKeyValueStore({
+		path: getKeyStoreForOrg(getOrgName(userOrg))
+	}).then((store) => {
+		client.setStateStore(store);
+		client._userContext = null;
 		return client.getUserContext(username, true).then((user) => {
 			if (user && user.isEnrolled()) {
 				logger.info('Successfully loaded member from persistence');
@@ -434,9 +434,8 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 					return false;
 				});
 			}
-		})
-	// })
-	.then((result) => {
+		});
+	}).then((result) => {
 		if (result == false) {
 			return false;
 		} else {
