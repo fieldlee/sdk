@@ -369,25 +369,7 @@ var registerUser = function (username, userOrg, isJson) {
 var loginRegisteredUser = function (username,secret ,userOrg) {
 	var member;
 	var client = getClientForOrg(userOrg);
-	let caClient = caClients[userOrg];
-	caClient.enroll({
-		enrollmentID: username,
-		enrollmentSecret: secret
-	}).then((message)=>{
-		logger.error("message:"+JSON.stringify(message));
-		if (message && typeof message === 'string' && message.includes(
-			'Error:')) {
-			logger.error(username + ' enrollment failed');
-		}
-		logger.debug(username + ' enrolled successfully');
-		logger.debug(username + ' key INFO:'+message.key);
-		logger.debug(username + ' certificate INFO:'+message.certificate);
-		member = new User(username);
-		member._enrollmentSecret = secret;
-		member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
-	},(err)=>{
-		logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
-	});
+	
 	return hfc.newDefaultKeyValueStore({
 		path: getKeyStoreForOrg(getOrgName(userOrg))
 	}).then((store) => {
