@@ -376,7 +376,8 @@ var loginRegisteredUser = async function (username,secret ,userOrg) {
 	client._userContext = null;
 	var user = await client.getUserContext(username, true);
 	if (user && user.isEnrolled()) {
-		let caClient = caClients[userOrg];
+		let caClient = client.getCertificateAuthority();
+		logger.debug(' caClient:' + caClient);
 		var msg = await caClient.enroll({enrollmentID: username,enrollmentSecret: secret});
 		logger.debug(username + ' INFO:' + msg);
 	}
