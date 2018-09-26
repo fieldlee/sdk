@@ -378,10 +378,11 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 		return client.getUserContext(username, true).then((user) => {
 			if (user && user.isEnrolled()) {
 				let caClient = caClients[userOrg];
-				return caClient.enroll({
-					enrollmentID: username,
-					enrollmentSecret: secret
-				}).then((message)=>{
+				// return caClient.enroll({
+				// 	enrollmentID: username,
+				// 	enrollmentSecret: secret
+				// })
+				return caClient.enroll(username,secret).then((message)=>{
 					if (message && typeof message === 'string' && message.includes(
 						'Error:')) {
 						logger.error(username + ' enrollment failed');
