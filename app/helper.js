@@ -179,8 +179,8 @@ function newRemotes(names, forPeers, userOrg) {
 	// find the peer that match the names
 	for (let idx in names) {
 		let peerName = names[idx];
-		logger.info("peerName:", peerName);
-		logger.info("ORGS:", ORGS);
+		// logger.info("peerName:", peerName);
+		// logger.info("ORGS:", ORGS);
 		if (ORGS[userOrg].peers[peerName]) {
 			// found a peer matching the name
 			// let data = fs.readFileSync(path.join(__dirname, ORGS[userOrg].peers[peerName]['tls_cacerts']));
@@ -369,8 +369,6 @@ var registerUser = function (username, userOrg, isJson) {
 var loginRegisteredUser = function (username,secret ,userOrg) {
 	var member;
 	var client = getClientForOrg(userOrg);
-	var enrollmentSecret = "MojmroAAHXRV";
-	
 	return hfc.newDefaultKeyValueStore({
 		path: getKeyStoreForOrg(getOrgName(userOrg))
 	}).then((store) => {
@@ -395,7 +393,7 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 					logger.debug(username + ' key INFO:'+message.key);
 					logger.debug(username + ' certificate INFO:'+message.certificate);
 					member = new User(username);
-					member._enrollmentSecret = enrollmentSecret;
+					member._enrollmentSecret = secret;
 					return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
 				},(err)=>{
 					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
