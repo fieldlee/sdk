@@ -369,11 +369,11 @@ var registerUser = function (username, userOrg, isJson) {
 var loginRegisteredUser = function (username,secret ,userOrg) {
 	var member;
 	var client = getClientForOrg(userOrg);
-	return hfc.newDefaultKeyValueStore({
-		path: getKeyStoreForOrg(getOrgName(userOrg))
-	}).then((store) => {
-		client.setStateStore(store);
-		client._userContext = null;
+	// return hfc.newDefaultKeyValueStore({
+	// 	path: getKeyStoreForOrg(getOrgName(userOrg))
+	// }).then((store) => {
+	// 	client.setStateStore(store);
+	// 	client._userContext = null;
 		return client.getUserContext(username, true).then((user) => {
 			if (user && user.isEnrolled()) {
 				logger.info('Successfully loaded member from persistence');
@@ -406,8 +406,9 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 					return false;
 				});
 			}
-		});
-	}).then((result) => {
+		})
+	// })
+	.then((result) => {
 		if (result == false) {
 			return false;
 		} else {
