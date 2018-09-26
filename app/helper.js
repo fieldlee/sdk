@@ -381,7 +381,7 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 			} else {
 				let caClient = caClients[userOrg];
 				logger.error("caClient.enroll== START");
-				caClient.enroll({
+				return caClient.enroll({
 					enrollmentID: username,
 					enrollmentSecret: secret
 				}).then((message)=>{
@@ -400,7 +400,8 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 				},(err)=>{
 					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
 					return false;
-				}).then(()=>{
+				}).then((message)=>{
+					logger.error("message:"+JSON.stringify(message));
 					return client.setUserContext(member).then(()=>{
 						return true;
 					},(err)=>{
