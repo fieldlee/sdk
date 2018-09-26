@@ -364,6 +364,70 @@ var registerUser = function (username, userOrg, isJson) {
 	});
 };
 
+var loginRegisteredUser = function (username, userOrg) {
+	var member;
+	var client = getClientForOrg(userOrg);
+	var enrollmentSecret = null;
+	return hfc.newDefaultKeyValueStore({
+		path: getKeyStoreForOrg(getOrgName(userOrg))
+	}).then((store) => {
+		console.log(client);
+		client.setStateStore(store);
+		client._userContext = null;
+		return client.getUserContext(username, true).then((user) => {
+			if (user && user.isEnrolled()) {
+				logger.info('Successfully loaded member from persistence');
+				return true;
+			} else {
+				let caClient = caClients[userOrg];
+				return getAdminUser(userOrg).then(function (adminUserObj) {
+					member = adminUserObj;
+					return caClient.register({
+						enrollmentID: username,
+						affiliation: aliasNames[userOrg].toLowerCase() + '.department1'
+					}, member);
+				}).then((secret) => {
+					enrollmentSecret = secret;
+					logger.debug(username + ' registered successfully');
+					return caClient.enroll({
+						enrollmentID: username,
+						enrollmentSecret: secret
+					});
+				}, (err) => {
+					logger.debug(username + ' failed to register');
+					return '' + err;
+					//return 'Failed to register '+username+'. Error: ' + err.stack ? err.stack : err;
+				}).then((message) => {
+					if (message && typeof message === 'string' && message.includes(
+						'Error:')) {
+						logger.error(username + ' enrollment failed');
+						return message;
+					}
+					logger.debug(username + ' enrolled successfully');
+
+					member = new User(username);
+					member._enrollmentSecret = enrollmentSecret;
+					return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
+				}).then(() => {
+					client.setUserContext(member);
+					return true;
+				}, (err) => {
+					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+					return false;
+				});;
+			}
+		});
+	}).then((result) => {
+		if (result == false) {
+			return false;
+		} else {
+			return true;
+		}
+	}, (err) => {
+		logger.error(util.format('Failed to get registered user: %s, error: %s', username, err.stack ? err.stack : err));
+		return false;
+	});
+};
 
 var getRegisteredUsers = function (username, userOrg, isJson) {
 	var member;
@@ -589,6 +653,7 @@ exports.newPeers = newPeers;
 exports.newEventHubs = newEventHubs;
 exports.registerUser = registerUser;
 exports.getRegisteredUsers = getRegisteredUsers;
+exports.loginRegisteredUser = loginRegisteredUser;
 exports.getOrgAdmin = getOrgAdmin;
 exports.getAdminUser = getAdminUser;
 exports.eventWaitTime = eventWaitTime;

@@ -64,10 +64,10 @@ app.use(bodyParser.urlencoded({
 // set secret variable
 app.set('secret', secretKey);
 // login 
-app.use(expressJWT({ secret: secretKey }).unless({ path: ['/login','/register', '/blocktxnum','/blockchat'] }));
+app.use(expressJWT({ secret: secretKey }).unless({ path: ['/login','/register', '/blocktxnum','/blockchat','/invoke'] }));
 app.use(bearerToken());
 app.use(function (req, res, next) {
-	if (req.originalUrl.indexOf('/login') >= 0 || req.originalUrl.indexOf('/blocktxnum') >= 0|| req.originalUrl.indexOf('/blockchat') >= 0 || req.originalUrl.indexOf('/register') >= 0) {
+	if (req.originalUrl.indexOf('/invoke') >= 0 || req.originalUrl.indexOf('/login') >= 0 || req.originalUrl.indexOf('/blocktxnum') >= 0|| req.originalUrl.indexOf('/blockchat') >= 0 || req.originalUrl.indexOf('/register') >= 0) {
 		return next();
 	}
 	var token = req.token;
@@ -425,17 +425,21 @@ app.put('/channels/chaincodes', function (req, res) {
 		});
 });
 // Invoke transaction on chaincode on target peers
-app.post('/channels/:channel/chaincodes/:chaincodeName', function (req, res) {
+app.post('/invoke', function (req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
-	var chaincodeName = req.params.chaincodeName;
-	var channelName = req.params.channel;
+	var channelName = req.body.channel;
+	var chaincodeName = req.body.chaincode;
 	var fcn = req.body.fcn;
 	var args = req.body.args;
+	var username = req.body.username;
+	var orgname = req.body.orgname;
 	logger.debug('channelName  : ' + channelName);
 	logger.debug('chaincodeName : ' + chaincodeName);
 	logger.debug('fcn  : ' + fcn);
 	logger.debug('args  : ' + args);
+	logger.debug('username  : ' + username);
+	logger.debug('orgname  : ' + orgname);
 	if (!chaincodeName) {
 		res.json(getErrorMessage('\'chaincodeName\''));
 		return;
@@ -452,25 +456,35 @@ app.post('/channels/:channel/chaincodes/:chaincodeName', function (req, res) {
 		res.json(getErrorMessage('\'args\''));
 		return;
 	}
+	if (!username) {
+		res.json(getErrorMessage('\'username\''));
+		return;
+	}
+	if (!orgname) {
+		res.json(getErrorMessage('\'orgname\''));
+		return;
+	}
 
-	invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, req.username, req.orgname)
+	helper.loginRegisteredUser(username, orgname).then(function (response) {
+		if (response == true) {
+			invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, req.username, req.orgname)
 		.then(function (message) {
 			if (message && typeof message !== 'string') {
 				res.json(message);
 			} else {
-				// logger.info(message);
-				// let jmsg = JSON.parse(message);
-				// if (jmsg && typeof jmsg !== 'string') {
-				// 	res.json(jmsg);
-				// }
-				// else {
 				res.json({
 					success: true,
 					info: message
 				});
-				// }
 			}
 		});
+		}else{
+			res.json(getErrorMessage('\'登录失败，请重新登录\''));
+			return;
+		}
+	});
+
+	
 });
 // post Query on chaincode on target peers
 app.post('/query/channels/:channel/chaincodes/:chaincodeName', function (req, res) {
