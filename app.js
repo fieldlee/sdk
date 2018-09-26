@@ -425,7 +425,7 @@ app.put('/channels/chaincodes', function (req, res) {
 		});
 });
 // Invoke transaction on chaincode on target peers
-app.post('/invoke', function (req, res) {
+app.post('/invoke', async function (req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
 	var channelName = req.body.channel;
@@ -469,24 +469,27 @@ app.post('/invoke', function (req, res) {
 		res.json(getErrorMessage('\'secret\''));
 		return;
 	}
-	helper.loginRegisteredUser(username,secret,orgname).then(function (response) {
-		if (response == true) {
-			invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, username, orgname)
-		.then(function (message) {
-			if (message && typeof message !== 'string') {
-				res.json(message);
-			} else {
-				res.json({
-					success: true,
-					info: message
-				});
-			}
-		});
-		}else{
-			res.json(getErrorMessage('\'登录失败，请重新登录\''));
-			return;
-		}
-	});
+
+	var logined =  await helper.loginRegisteredUser(username,secret,orgname);
+
+	// helper.loginRegisteredUser(username,secret,orgname).then(function (response) {
+	// 	if (response == true) {
+	// 		invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, username, orgname)
+	// 	.then(function (message) {
+	// 		if (message && typeof message !== 'string') {
+	// 			res.json(message);
+	// 		} else {
+	// 			res.json({
+	// 				success: true,
+	// 				info: message
+	// 			});
+	// 		}
+	// 	});
+	// 	}else{
+	// 		res.json(getErrorMessage('\'登录失败，请重新登录\''));
+	// 		return;
+	// 	}
+	// });
 
 	
 });

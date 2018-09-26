@@ -366,68 +366,84 @@ var registerUser = function (username, userOrg, isJson) {
 	});
 };
 
-var loginRegisteredUser = function (username,secret ,userOrg) {
+var loginRegisteredUser = async function (username,secret ,userOrg) {
 	var member;
 	var client = getClientForOrg(userOrg);
-	return hfc.newDefaultKeyValueStore({
+	var store = await hfc.newDefaultKeyValueStore({
 		path: getKeyStoreForOrg(getOrgName(userOrg))
-	}).then((store) => {
-		client.setStateStore(store);
-		client._userContext = null;
-		logger.info(client);
-		return client.getUserContext(username, true).then((user) => {
-			if (user && user.isEnrolled()) {
-				let caClient = caClients[userOrg];
-				// return caClient.enroll({
-				// 	enrollmentID: username,
-				// 	enrollmentSecret: secret
-				// })
-				return caClient.enroll(username,secret).then((message)=>{
-					if (message && typeof message === 'string' && message.includes(
-						'Error:')) {
-						logger.error(username + ' enrollment failed');
-						return message;
-					}
-					logger.debug(username + ' enrolled successfully');
-					logger.debug(username + ' INFO:'+message);
-					member = new User(username);
-					member._enrollmentSecret = secret;
-					return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
-				},(err)=>{
-					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
-				}).then((msg) => {
-					logger.debug(username + 'msg INFO:'+msg);
-					client.setUserContext(member);
-					return member;
-				}, (err) => {
-					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
-					return '' + err;
-				});
-				// logger.info('Successfully loaded member from persistence');
-				// return true;
-			} else {
-				return client.setUserContext({"username":username,"password":secret},true).then((msg)=>{
-					logger.error(util.format('%s setUserContext success: %s', username, msg));
-					return true;
-				},(err)=>{
-					logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
-					return false;
-				});
-			}
-		},(err)=>{
-			logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
-			return false;
-		});
-	}).then((result) => {
-		if (result == false) {
-			return false;
-		} else {
-			return true;
-		}
-	}, (err) => {
-		logger.error(util.format('Failed to get registered user: %s, error: %s', username, err.stack ? err.stack : err));
-		return false;
 	});
+	client.setStateStore(store);
+	client._userContext = null;
+	var user = await client.getUserContext(username, true);
+	if (user && user.isEnrolled()) {
+		let caClient = caClients[userOrg];
+		var msg = await caClient.enroll(username,secret);
+		logger.debug(username + ' INFO:' + msg);
+	}
+	// return hfc.newDefaultKeyValueStore({
+	// 	path: getKeyStoreForOrg(getOrgName(userOrg))
+	// }).then((store) => {
+	// 	client.setStateStore(store);
+	// 	client._userContext = null;
+	// 	logger.info(client);
+	// 	return client.getUserContext(username, true).then((user) => {
+	// 		if (user && user.isEnrolled()) {
+	// 			let caClient = caClients[userOrg];
+	// 			// return caClient.enroll({
+	// 			// 	enrollmentID: username,
+	// 			// 	enrollmentSecret: secret
+	// 			// })
+	// 			var msg = await caClient.enroll(username,secret);
+	// 			logger.debug(username + ' INFO:'+message);
+	// 			member = new User(username);
+	// 				member._enrollmentSecret = secret;
+	// 			await member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
+	// 			return caClient.enroll(username,secret).then((message)=>{
+	// 				if (message && typeof message === 'string' && message.includes(
+	// 					'Error:')) {
+	// 					logger.error(username + ' enrollment failed');
+	// 					return message;
+	// 				}
+	// 				logger.debug(username + ' enrolled successfully');
+	// 				logger.debug(username + ' INFO:'+message);
+	// 				member = new User(username);
+	// 				member._enrollmentSecret = secret;
+	// 				return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
+	// 			},(err)=>{
+	// 				logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+	// 			}).then((msg) => {
+	// 				logger.debug(username + 'msg INFO:'+msg);
+	// 				client.setUserContext(member);
+	// 				return member;
+	// 			}, (err) => {
+	// 				logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+	// 				return '' + err;
+	// 			});
+	// 			// logger.info('Successfully loaded member from persistence');
+	// 			// return true;
+	// 		} else {
+	// 			return client.setUserContext({"username":username,"password":secret},true).then((msg)=>{
+	// 				logger.error(util.format('%s setUserContext success: %s', username, msg));
+	// 				return true;
+	// 			},(err)=>{
+	// 				logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
+	// 				return false;
+	// 			});
+	// 		}
+	// 	},(err)=>{
+	// 		logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
+	// 		return false;
+	// 	});
+	// }).then((result) => {
+	// 	if (result == false) {
+	// 		return false;
+	// 	} else {
+	// 		return true;
+	// 	}
+	// }, (err) => {
+	// 	logger.error(util.format('Failed to get registered user: %s, error: %s', username, err.stack ? err.stack : err));
+	// 	return false;
+	// });
 };
 
 var getRegisteredUsers = function (username, userOrg, isJson) {
