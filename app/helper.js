@@ -379,7 +379,7 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 				logger.info('Successfully loaded member from persistence');
 				return true;
 			} else {
-				return client.setUserContext({username:username,password:secret}).then((msg)=>{
+				return client.setUserContext({username:username,password:secret},true).then((msg)=>{
 					logger.error(util.format('%s setUserContext success: %s', username, msg));
 					return true;
 				},(err)=>{
