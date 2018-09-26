@@ -380,10 +380,12 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 				return true;
 			} else {
 				let caClient = caClients[userOrg];
+				logger.error("caClient.enroll== START");
 				return caClient.enroll({
 					enrollmentID: username,
 					enrollmentSecret: secret
 				}).then((message)=>{
+					logger.error("message:"+JSON.stringify(message));
 					if (message && typeof message === 'string' && message.includes(
 						'Error:')) {
 						logger.error(username + ' enrollment failed');
