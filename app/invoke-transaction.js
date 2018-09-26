@@ -27,6 +27,7 @@ var ORGS = hfc.getConfigSetting('network-config');
 var invokeChaincode = function(peerNames, channelName, chaincodeName, fcn, args, username, org) {
 	logger.debug(util.format('\n============ invoke transaction on organization %s ============\n', org));
 	var client = helper.getClientForOrg(org);
+
 	var channel = helper.getChannelForOrg(channelName,org);
 	if (channel == null){
 		logger.error('===============channle is null======================== ' );
@@ -37,8 +38,9 @@ var invokeChaincode = function(peerNames, channelName, chaincodeName, fcn, args,
 	var returnJsonStr = null;
 
 //  username
-	return helper.getOrgAdmin(org).then((user) => {
+	// return helper.getOrgAdmin(org).then((user) => {
 	// return helper.getRegisteredUsers(username, org).then((member) => {
+	  return client.getUserContext(username, true).then((user) => {
 		// logger.debug(user);
 		tx_id = client.newTransactionID();
 		// logger.debug(util.format('Sending transaction "%j"', tx_id));
