@@ -212,6 +212,7 @@ function newRemotes(names, forPeers, userOrg) {
 // APIs
 //-------------------------------------//
 var getChannelForOrg = function (channelName, org) {
+	logger.debug("channels:"+JSON.stringify(channels))
 	let chans = channels[org];
 	for (let index = 0; index < chans.length; index++) {
 		const chan = chans[index];
