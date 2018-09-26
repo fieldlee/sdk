@@ -380,7 +380,7 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 				logger.info('Successfully loaded member from persistence');
 				return true;
 			} else {
-				return client.setUserContext({username:username,password:secret},true).then((msg)=>{
+				return client.setUserContext(user,true).then((msg)=>{
 					logger.error(util.format('%s setUserContext success: %s', username, msg));
 					return true;
 				},(err)=>{
@@ -388,6 +388,9 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 					return false;
 				});
 			}
+		},(err)=>{
+			logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
+			return false;
 		});
 	}).then((result) => {
 		if (result == false) {
