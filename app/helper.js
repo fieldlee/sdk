@@ -367,7 +367,8 @@ var registerUser = function (username, userOrg, isJson) {
 var loginRegisteredUser = function (username, userOrg) {
 	var member;
 	var client = getClientForOrg(userOrg);
-	var enrollmentSecret = null;
+	var enrollmentSecret = "MojmroAAHXRV";
+	var certificate = "-----BEGIN CERTIFICATE-----\nMIICkjCCAjmgAwIBAgIUOzAz0uxAxfSGGjPrewNpE/Z3F8kwCgYIKoZIzj0EAwIw\ndTELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh\nbiBGcmFuY2lzY28xGjAYBgNVBAoTEXN1cmVPcmcubWNjdHYuY29tMR0wGwYDVQQD\nExRjYS5zdXJlT3JnLm1jY3R2LmNvbTAeFw0xODA5MjYwMTUwMDBaFw0xOTA5MjYw\nMTU1MDBaMEMxMDANBgNVBAsTBmNsaWVudDALBgNVBAsTBG9yZzEwEgYDVQQLEwtk\nZXBhcnRtZW50MTEPMA0GA1UEAxMGZGVwZW5nMFkwEwYHKoZIzj0CAQYIKoZIzj0D\nAQcDQgAEDJOR5mjchgUAIh9KNW7fXISCLgLzADfodvQJzTx5s2GOP9auOwe4wLrd\n1mut03251Yl59ssgw6AJpnIvEn2QtqOB2DCB1TAOBgNVHQ8BAf8EBAMCB4AwDAYD\nVR0TAQH/BAIwADAdBgNVHQ4EFgQU2rm6ABmLVtb/maREyEg1FQIuz4QwKwYDVR0j\nBCQwIoAgFbSE+otH9BqxklU+tuXkoZg/We7iUiapQpBawrdMxa0waQYIKgMEBQYH\nCAEEXXsiYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiJvcmcxLmRlcGFydG1lbnQx\nIiwiaGYuRW5yb2xsbWVudElEIjoiZGVwZW5nIiwiaGYuVHlwZSI6ImNsaWVudCJ9\nfTAKBggqhkjOPQQDAgNHADBEAiBGz0qSYq61qsgtc/EKNqYmhMwbKgFtJbc2e0Ut\nU1puPwIgYY9jQrQ36rwMaVSG7PV4K5kJdxmBrpc5xlAvaw/jeaA=\n-----END CERTIFICATE-----\n";
 	return hfc.newDefaultKeyValueStore({
 		path: getKeyStoreForOrg(getOrgName(userOrg))
 	}).then((store) => {
@@ -381,22 +382,33 @@ var loginRegisteredUser = function (username, userOrg) {
 			} else {
 				let caClient = caClients[userOrg];
 				member = new User(username);
-				return caClient.reenroll(member).then((message) => {
-					logger.debug(util.format("%s reenroll %s ",username,JSON.stringify(message)));
+				member._enrollmentSecret = enrollmentSecret;
+				logger.debug(username + ' member:'+JSON.stringify(member));
+				return member.setEnrollment("", certificate, getMspID(userOrg)).then(()=>{
 					logger.debug(username + ' enrolled successfully');
-					member = new User(username);
-					member._enrollmentSecret = enrollmentSecret;
-					return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
+					client.setUserContext(member);
+					return true;
 				},(err)=>{
 					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
 					return false;
-				}).then(() => {
-					client.setUserContext(member);
-					return true;
-				}, (err) => {
-					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
-					return false;
-				});;
+				});
+				// member = new User(username);
+				// return caClient.reenroll(member).then((message) => {
+				// 	logger.debug(util.format("%s reenroll %s ",username,JSON.stringify(message)));
+				// 	logger.debug(username + ' enrolled successfully');
+				// 	member = new User(username);
+				// 	member._enrollmentSecret = enrollmentSecret;
+				// 	return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
+				// },(err)=>{
+				// 	logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+				// 	return false;
+				// }).then(() => {
+				// 	client.setUserContext(member);
+				// 	return true;
+				// }, (err) => {
+				// 	logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+				// 	return false;
+				// });;
 			}
 		});
 	}).then((result) => {
@@ -452,7 +464,7 @@ var getRegisteredUsers = function (username, userOrg, isJson) {
 						return message;
 					}
 					logger.debug(username + ' enrolled successfully');
-
+					logger.debug(username + ' INFO:'+JSON.stringify(message));
 					member = new User(username);
 					member._enrollmentSecret = enrollmentSecret;
 					return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
