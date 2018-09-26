@@ -377,7 +377,7 @@ var loginRegisteredUser = async function (username,secret ,userOrg) {
 	var user = await client.getUserContext(username, true);
 	if (user && user.isEnrolled()) {
 		let caClient = caClients[userOrg];
-		var msg = await caClient.enroll(username,secret);
+		var msg = await caClient.enroll({enrollmentID: username,enrollmentSecret: secret});
 		logger.debug(username + ' INFO:' + msg);
 	}
 	// return hfc.newDefaultKeyValueStore({
