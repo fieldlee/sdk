@@ -378,7 +378,13 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 		return client.getUserContext(username, true).then((user) => {
 			if (user && user.isEnrolled()) {
 				logger.info('Successfully loaded member from persistence');
-				return true;
+				return client.setUserContext(user).then(()=>{
+					return true;
+				},(err)=>{
+					logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
+					return false;
+				});
+				// return true;
 			} else {
 				let caClient = caClients[userOrg];
 				logger.error("caClient.enroll== START");
