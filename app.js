@@ -431,6 +431,7 @@ app.post('/invoke', function (req, res) {
 	var channelName = req.body.channel;
 	var chaincodeName = req.body.chaincode;
 	var fcn = req.body.fcn;
+	var secret = req.body.secret;
 	var args = req.body.args;
 	var username = req.body.username;
 	var orgname = req.body.orgname;
@@ -464,8 +465,11 @@ app.post('/invoke', function (req, res) {
 		res.json(getErrorMessage('\'orgname\''));
 		return;
 	}
-
-	helper.loginRegisteredUser(username, orgname).then(function (response) {
+	if (!secret) {
+		res.json(getErrorMessage('\'secret\''));
+		return;
+	}
+	helper.loginRegisteredUser(username,secret,orgname).then(function (response) {
 		if (response == true) {
 			invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, req.username, req.orgname)
 		.then(function (message) {
