@@ -367,7 +367,7 @@ var registerUser = function (username, userOrg, isJson) {
 };
 
 var loginRegisteredUser = function (username,secret ,userOrg) {
-	// var member;
+	var member;
 	var client = getClientForOrg(userOrg);
 	return hfc.newDefaultKeyValueStore({
 		path: getKeyStoreForOrg(getOrgName(userOrg))
@@ -377,12 +377,30 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 		logger.info(client);
 		return client.getUserContext(username, true).then((user) => {
 			if (user && user.isEnrolled()) {
-				return client.setUserContext({"username":username,"password":secret},true).then((msg)=>{
-					logger.error(util.format('%s setUserContext success: %s', username, msg));
-					return true;
+				let caClient = caClients[userOrg];
+				return caClient.enroll({
+					enrollmentID: username,
+					enrollmentSecret: secret
+				}).then((message)=>{
+					if (message && typeof message === 'string' && message.includes(
+						'Error:')) {
+						logger.error(username + ' enrollment failed');
+						return message;
+					}
+					logger.debug(username + ' enrolled successfully');
+					logger.debug(username + ' INFO:'+message);
+					member = new User(username);
+					member._enrollmentSecret = secret;
+					return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
 				},(err)=>{
-					logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
-					return false;
+					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+				}).then((msg) => {
+					logger.debug(username + 'msg INFO:'+msg);
+					client.setUserContext(member);
+					return member;
+				}, (err) => {
+					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+					return '' + err;
 				});
 				// logger.info('Successfully loaded member from persistence');
 				// return true;
