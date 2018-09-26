@@ -374,6 +374,7 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 	}).then((store) => {
 		client.setStateStore(store);
 		client._userContext = null;
+		logger.info(client);
 		return client.getUserContext(username, true).then((user) => {
 			if (user && user.isEnrolled()) {
 				logger.info('Successfully loaded member from persistence');
