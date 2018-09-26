@@ -471,7 +471,7 @@ app.post('/invoke', function (req, res) {
 	}
 	helper.loginRegisteredUser(username,secret,orgname).then(function (response) {
 		if (response == true) {
-			invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, req.username, req.orgname)
+			invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, username, orgname)
 		.then(function (message) {
 			if (message && typeof message !== 'string') {
 				res.json(message);
