@@ -381,7 +381,7 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 			} else {
 				let caClient = caClients[userOrg];
 				logger.error("caClient.enroll== START");
-				return caClient.enroll({
+				caClient.enroll({
 					enrollmentID: username,
 					enrollmentSecret: secret
 				}).then((message)=>{
