@@ -399,8 +399,12 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
 					return false;
 				}).then(()=>{
-					client.setUserContext(member);
-					return true;
+					return client.setUserContext(member).then(()=>{
+						return true;
+					},(err)=>{
+						logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
+						return false;
+					});
 				},(err)=>{
 					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
 					return false;
