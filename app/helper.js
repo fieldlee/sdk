@@ -380,7 +380,8 @@ var loginRegisteredUser = function (username, userOrg) {
 				return true;
 			} else {
 				let caClient = caClients[userOrg];
-				return caClient.reenroll(username).then((message) => {
+				member = new User(username);
+				return caClient.reenroll(member).then((message) => {
 					logger.debug(util.format("%s reenroll %s ",username,JSON.stringify(message)));
 					logger.debug(username + ' enrolled successfully');
 					member = new User(username);
