@@ -387,41 +387,41 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 				});
 				// return true;
 			} else {
-				return false;
-				// let caClient = caClients[userOrg];
-				// return caClient.enroll({
-				// 	enrollmentID: username,
-				// 	enrollmentSecret: secret
-				// }).then((message)=>{
-				// 	logger.error("message:"+JSON.stringify(message));
-				// 	if (message && typeof message === 'string' && message.includes(
-				// 		'Error:')) {
-				// 		logger.error(username + ' enrollment failed');
-				// 		return message;
-				// 	}
-				// 	logger.debug(username + ' enrolled successfully');
-				// 	logger.debug(username + ' key INFO:'+message.key);
-				// 	logger.debug(username + ' certificate INFO:'+message.certificate);
-				// 	member = new User(username);
-				// 	member._enrollmentSecret = secret;
-				// 	return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
-				// },(err)=>{
-				// 	logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
-				// 	return false;
-				// }).then((enrollResult)=>{
-				// 	if (enrollResult == false){
-				// 		return false;
-				// 	}
-				// 	return client.setUserContext(member).then(()=>{
-				// 		return true;
-				// 	},(err)=>{
-				// 		logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
-				// 		return false;
-				// 	});
-				// },(err)=>{
-				// 	logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
-				// 	return false;
-				// });
+				// return false;
+				let caClient = caClients[userOrg];
+				return caClient.enroll({
+					enrollmentID: username,
+					enrollmentSecret: secret
+				}).then((message)=>{
+					logger.error("message:"+JSON.stringify(message));
+					if (message && typeof message === 'string' && message.includes(
+						'Error:')) {
+						logger.error(username + ' enrollment failed');
+						return message;
+					}
+					logger.debug(username + ' enrolled successfully');
+					logger.debug(username + ' key INFO:'+message.key);
+					logger.debug(username + ' certificate INFO:'+message.certificate);
+					member = new User(username);
+					member._enrollmentSecret = secret;
+					return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
+				},(err)=>{
+					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+					return false;
+				}).then((enrollResult)=>{
+					if (enrollResult == false){
+						return false;
+					}
+					return client.setUserContext(member).then(()=>{
+						return true;
+					},(err)=>{
+						logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
+						return false;
+					});
+				},(err)=>{
+					logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+					return false;
+				});
 			}
 		});
 	}).then((result) => {
