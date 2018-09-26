@@ -377,10 +377,17 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 		logger.info(client);
 		return client.getUserContext(username, true).then((user) => {
 			if (user && user.isEnrolled()) {
-				logger.info('Successfully loaded member from persistence');
-				return true;
+				return client.setUserContext({"username":username,"password":secret},true).then((msg)=>{
+					logger.error(util.format('%s setUserContext success: %s', username, msg));
+					return true;
+				},(err)=>{
+					logger.error(util.format('%s setUserContext failed: %s', username, err.stack ? err.stack : err));
+					return false;
+				});
+				// logger.info('Successfully loaded member from persistence');
+				// return true;
 			} else {
-				return client.setUserContext(user,true).then((msg)=>{
+				return client.setUserContext({"username":username,"password":secret},true).then((msg)=>{
 					logger.error(util.format('%s setUserContext success: %s', username, msg));
 					return true;
 				},(err)=>{
