@@ -21,6 +21,7 @@ var hfc = require('fabric-client');
 var Peer = require('fabric-client/lib/Peer.js');
 var helper = require('./helper.js');
 var logger = helper.getLogger('invoke-chaincode');
+logger.setLevel('ERROR');
 var EventHub = require('fabric-client/lib/EventHub.js');
 var ORGS = hfc.getConfigSetting('network-config');
 
