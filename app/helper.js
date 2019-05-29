@@ -325,6 +325,7 @@ var registerUser = function (username, userOrg, isJson) {
 					return '' + err;
 					//return 'Failed to register '+username+'. Error: ' + err.stack ? err.stack : err;
 				}).then((message) => {
+					logger.info("message1:");
 					logger.info(message);
 					if (message && typeof message === 'string' && message.includes(
 						'Error:')) {
@@ -385,6 +386,7 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 					enrollmentID: username,
 					enrollmentSecret: secret
 				}).then((message)=>{
+					logger.info("message2:");
 					logger.info(message);
 					if (message && typeof message === 'string' && message.includes(
 						'Error:')) {
@@ -462,6 +464,7 @@ var getRegisteredUsers = function (username, userOrg, isJson) {
 					return '' + err;
 					//return 'Failed to register '+username+'. Error: ' + err.stack ? err.stack : err;
 				}).then((message) => {
+					logger.info("message3:");
 					logger.info(message);
 					if (message && typeof message === 'string' && message.includes(
 						'Error:')) {
