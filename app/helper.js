@@ -503,6 +503,8 @@ var getRegisteredUsers = function (username, userOrg, isJson) {
 
 var getOrgAdmin = function (userOrg) {
 	var admin = ORGS[userOrg].admin;
+	logger.info("admin:");
+	logger.info(admin);
 	var keyPath = admin.key;
 	var keyPEM = Buffer.from(readAllFiles(keyPath)[0]).toString();
 	// var certPath = path.join(__dirname, admin.cert);
@@ -510,6 +512,10 @@ var getOrgAdmin = function (userOrg) {
 	var certPEM = readAllFiles(certPath)[0].toString();
 	var client = getClientForOrg(userOrg);
 	var cryptoSuite = hfc.newCryptoSuite();
+
+
+	logger.info("userOrg:");
+	logger.info(userOrg);
 	if (userOrg) {
 		cryptoSuite.setCryptoKeyStore(hfc.newCryptoKeyStore({ path: getKeyStoreForOrg(getOrgName(userOrg)) }));
 		client.setCryptoSuite(cryptoSuite);
@@ -518,6 +524,8 @@ var getOrgAdmin = function (userOrg) {
 	return hfc.newDefaultKeyValueStore({
 		path: getKeyStoreForOrg(getOrgName(userOrg))
 	}).then((store) => {
+		logger.info("store:");
+		logger.info(store);
 		client.setStateStore(store);
 
 		return client.createUser({

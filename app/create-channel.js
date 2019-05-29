@@ -55,6 +55,7 @@ var createChannel = function(channelName, channelConfigPath, username, orgName) 
 		logger.error('Failed to enroll user \''+username+'\'. Error: ' + err);
 		throw new Error('Failed to enroll user \''+username+'\'' + err);
 	}).then((response) => {
+		logger.info(response);
 		if (response && response.status === 'SUCCESS') {
 			logger.debug('Successfully created the channel.');
 			let response = {
