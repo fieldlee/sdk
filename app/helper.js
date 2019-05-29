@@ -325,6 +325,7 @@ var registerUser = function (username, userOrg, isJson) {
 					return '' + err;
 					//return 'Failed to register '+username+'. Error: ' + err.stack ? err.stack : err;
 				}).then((message) => {
+					logger.info(message);
 					if (message && typeof message === 'string' && message.includes(
 						'Error:')) {
 						logger.error(username + ' enrollment failed');
@@ -384,6 +385,7 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 					enrollmentID: username,
 					enrollmentSecret: secret
 				}).then((message)=>{
+					logger.info(message);
 					if (message && typeof message === 'string' && message.includes(
 						'Error:')) {
 						logger.error(username + ' enrollment failed');
@@ -460,6 +462,7 @@ var getRegisteredUsers = function (username, userOrg, isJson) {
 					return '' + err;
 					//return 'Failed to register '+username+'. Error: ' + err.stack ? err.stack : err;
 				}).then((message) => {
+					logger.info(message);
 					if (message && typeof message === 'string' && message.includes(
 						'Error:')) {
 						logger.error(username + ' enrollment failed');
