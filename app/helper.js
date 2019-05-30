@@ -429,7 +429,7 @@ var loginRegisteredUser = function (username,secret ,userOrg) {
 	});
 };
 
-var getRegisteredUsers = function (username, userOrg, isJson) {
+var getRegisteredUsers = function (username, userOrg, isJson,password) {
 	var member;
 	var client = getClientForOrg(userOrg);
 	var enrollmentSecret = null;
@@ -446,6 +446,33 @@ var getRegisteredUsers = function (username, userOrg, isJson) {
 				return user;
 			} else {
 				let caClient = caClients[userOrg];
+				if ( typeof(password) != "undefined" && password != ""){
+					return caClient.enroll({
+						enrollmentID: username,
+						enrollmentSecret: password
+					}).then((message) => {
+						logger.info("message4:");
+						logger.info(message);
+						if (message && typeof message === 'string' && message.includes(
+							'Error:')) {
+							logger.error(username + ' enrollment failed');
+							return message;
+						}
+						logger.debug(username + ' enrolled successfully');
+						member = new User(username);
+						member._enrollmentSecret = enrollmentSecret;
+						logger.info(message.key);
+						logger.info(message.certificate);
+						return member.setEnrollment(message.key, message.certificate, getMspID(userOrg));
+					}).then(() => {
+						client.setUserContext(member);
+						return member;
+					}, (err) => {
+						logger.error(util.format('%s enroll failed: %s', username, err.stack ? err.stack : err));
+						return '' + err;
+					});
+				}
+
 				return getAdminUser(userOrg).then(function (adminUserObj) {
 					member = adminUserObj;
 					return caClient.register({
