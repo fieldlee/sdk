@@ -471,8 +471,8 @@ app.post('/invoke',  function (req, res) {
 		return;
 	}
 
-	helper.loginRegisteredUser(username,secret,orgname).then(function (response) {
-		if (response == true) {
+	// helper.loginRegisteredUser(username,secret,orgname).then(function (response) {
+	// 	if (response == true) {
 			invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, username, orgname)
 		.then(function (message) {
 			if (message && typeof message !== 'string') {
@@ -484,11 +484,11 @@ app.post('/invoke',  function (req, res) {
 				});
 			}
 		});
-		}else{
-			res.json(getErrorMessage('\'登录失败，请重新登录\''));
-			return;
-		}
-	});
+		// }else{
+		// 	res.json(getErrorMessage('\'登录失败，请重新登录\''));
+		// 	return;
+		// }
+	// });
 
 	
 });
