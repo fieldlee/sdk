@@ -76,7 +76,7 @@ var invokeChaincode = function(peerNames, channelName, chaincodeName, fcn, args,
 				if (errinfo == "") {
 					errinfo = proposalResponses[i].details;
 					if (errinfo.indexOf("message:")>0){
-						errinfo = errinfo.substring(errinfo.indexOf("message:")+1,errinfo.length-errinfo.indexOf("message:")-1)
+						errinfo = errinfo.substring(errinfo.indexOf("message:")+8,errinfo.length-errinfo.indexOf("message:")-8-1)
 					}
 				}
 				logger.error('transaction proposal was bad');
