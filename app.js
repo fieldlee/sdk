@@ -115,7 +115,7 @@ function getErrorMessage(field) {
 app.post('/login', function (req, res) {
 	var username = req.body.username;
 	var password = req.body.password;
-	var orgName = req.body.orgName;
+	var orgName = req.body.orgname;
 	logger.debug('End point : /login');
 	logger.debug('User name : ' + username);
 	logger.debug('Org name  : ' + orgName);
@@ -442,13 +442,14 @@ app.post('/invoke',  function (req, res) {
 	logger.debug('args  : ' + args);
 	logger.debug('username  : ' + username);
 	logger.debug('orgname  : ' + orgname);
+	if (!peers) {
+		peers=["peer0","peer1"];
+	}
 	if (!chaincodeName) {
-		res.json(getErrorMessage('\'chaincodeName\''));
-		return;
+		chaincodeName="ledger";
 	}
 	if (!channelName) {
-		res.json(getErrorMessage('\'channelName\''));
-		return;
+		channelName = "mmchannel";
 	}
 	if (!fcn) {
 		res.json(getErrorMessage('\'fcn\''));
