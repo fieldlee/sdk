@@ -124,8 +124,12 @@ app.post('/login', function (req, res) {
 		return;
 	}
 	if (!orgName) {
-		res.json(getErrorMessage('\'orgName\''));
-		return;
+		orgName = req.body.orgName;
+		if  (!orgName) {
+			res.json(getErrorMessage('\'orgName\''));
+			return;
+		}
+		
 	}
 	var token = jwt.sign({
 		exp: Math.floor(Date.now() / 1000) + parseInt(hfc.getConfigSetting('jwt_expiretime')),
